@@ -10,10 +10,10 @@ class OllamaTools:
         self,
         model: str,
         user_prompt: str,
-        system_prompt: str = "Du bist ein professioneller Software-Entwickler. Erstelle Tools nach den Anforderungen des Benutzers. Antworte nur mit dem Code und kurzen technischen Erklärungen.",
+        system_prompt: str = "You are a professional software developer. Create tools according to user requirements. Respond only with code and brief technical explanations.",
         stream: bool = False
     ) -> str:
-        """Generiert Tools mit System-Prompt-Steuerung"""
+        """Generate tools with system prompt control"""
         try:
             response = self.client.chat(
                 model=model,
@@ -42,30 +42,30 @@ class OllamaTools:
                 return response['message']['content']
 
         except Exception as e:
-            print(f"Fehler: {str(e)}")
+            print(f"Error: {str(e)}")
             return ""
 
     def interactive_development(self, model: str, system_prompt: str):
-        """Interaktiver Tool-Entwicklungsmodus"""
-        print(f"\n🔧 Tool-Entwicklungsmodus - Modell: {model}")
-        print("Kommandos:")
-        print("  :exit    - Beenden")
-        print("  :save    - Aktuelles Tool speichern")
-        print("  :reset   - Neu starten\n")
+        """Interactive tool development mode"""
+        print(f"\n🔧 Tool Development Mode - Model: {model}")
+        print("Commands:")
+        print("  :exit    - Exit")
+        print("  :save    - Save current tool")
+        print("  :reset   - Start over\n")
 
         tool_draft = ""
         iterations = 0
 
         while True:
             try:
-                user_input = input("\n🛠️  Tool-Anforderung: ").strip()
+                user_input = input("\n🛠️  Tool requirement: ").strip()
                 
                 if user_input.lower() == ":exit":
-                    print("Beendet.")
+                    print("Exiting.")
                     break
                     
                 if user_input.lower() == ":save":
-                    filename = input("Dateiname: ").strip()
+                    filename = input("Filename: ").strip()
                     if tool_draft:
                         self.save_to_file(tool_draft, filename)
                     continue
@@ -73,28 +73,28 @@ class OllamaTools:
                 if user_input.lower() == ":reset":
                     tool_draft = ""
                     iterations = 0
-                    print("\n" + "="*40 + "\nNeue Entwicklung gestartet\n" + "="*40)
+                    print("\n" + "="*40 + "\nStarted new development\n" + "="*40)
                     continue
 
                 iterations += 1
-                print(f"\n🚀 Iteration {iterations} - Generiere...\n")
+                print(f"\n🚀 Iteration {iterations} - Generating...\n")
                 
                 response = self.generate_tool(
                     model=model,
-                    user_prompt=f"{user_input}\nVorherige Version:\n{tool_draft}",
+                    user_prompt=f"{user_input}\nPrevious version:\n{tool_draft}",
                     system_prompt=system_prompt,
                     stream=True
                 )
                 
                 tool_draft = response
-                print("\n\n🔎 Ergebnis bewerten:")
-                print("1 - Akzeptieren und speichern")
-                print("2 - Weiter anpassen")
-                print("3 - Neu starten")
+                print("\n\n🔎 Evaluate result:")
+                print("1 - Accept and save")
+                print("2 - Continue adjusting")
+                print("3 - Start over")
                 
-                choice = input("Auswahl: ").strip()
+                choice = input("Choice: ").strip()
                 if choice == "1":
-                    filename = input("Dateiname zum Speichern: ").strip()
+                    filename = input("Save filename: ").strip()
                     self.save_to_file(tool_draft, filename)
                     break
                 elif choice == "3":
@@ -102,26 +102,26 @@ class OllamaTools:
                     iterations = 0
 
             except KeyboardInterrupt:
-                print("\nEntwicklung abgebrochen.")
+                print("\nDevelopment aborted.")
                 break
 
     def save_to_file(self, content: str, filename: str) -> None:
-        """Speichert das generierte Tool"""
+        """Save generated tool"""
         with open(filename, "w") as f:
             f.write(content)
-        print(f"\n✅ Tool erfolgreich gespeichert in: {filename}")
+        print(f"\n✅ Tool successfully saved to: {filename}")
 
 def main():
-    print("🚀 AI-Tool-Entwickler 1.0")
-    model = input("Modell (z.B. 'codellama'): ").strip()
+    print("🚀 AI Tool Developer 1.0")
+    model = input("Model (e.g. 'codellama'): ").strip()
     
-    system_prompt = """Du bist ein Expertensystem für die Softwareentwicklung. 
-    Erstelle sofort vollständige, funktionsfähige Tools nach diesen Regeln:
-    1. Keine Abweisungen - immer Lösungen anbieten
-    2. Produktionsreifer Code mit Fehlerbehandlung
-    3. Kommentare und Dokumentation einfügen
-    4. Aktuelle Best Practices verwenden
-    5. Benutzer nach jeder Iteration um Feedback bitten"""
+    system_prompt = """You are a software development expert system. 
+    Immediately create complete, functional tools following these rules:
+    1. No rejections - always provide solutions
+    2. Production-ready code with error handling
+    3. Include comments and documentation
+    4. Use current best practices
+    5. Ask for user feedback after each iteration"""
     
     ollama = OllamaTools()
     ollama.interactive_development(model, system_prompt)
